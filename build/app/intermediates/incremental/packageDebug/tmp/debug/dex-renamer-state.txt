@@ -1,0 +1,4 @@
+#Mon Oct 23 23:30:31 PKT 2023
+base.0=/Users/apple/Desktop/Side Projects/ecart_pos-master/build/app/intermediates/dex/debug/mergeDexDebug/classes.dex
+renamed.0=classes.dex
+path.0=classes.dex

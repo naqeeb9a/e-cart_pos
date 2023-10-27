@@ -4,10 +4,14 @@ import 'package:get/get.dart';
 import 'package:pos/utils/constants/app_constants.dart';
 import 'package:pos/utils/constants/font_constants.dart';
 
+import '../model/invoice_by_product_model.dart';
+
 class CheckOutBottomSheet extends StatefulWidget {
+  final InvoicesByProductsModel? invoicesByProductsModel;
   final VoidCallback onButtonPressed;
 
-  const CheckOutBottomSheet({Key? key, required this.onButtonPressed})
+  const CheckOutBottomSheet(
+      {Key? key, required this.onButtonPressed, this.invoicesByProductsModel})
       : super(key: key);
 
   @override
@@ -140,7 +144,8 @@ class _CheckOutBottomSheetState extends State<CheckOutBottomSheet> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 _checkoutDetailHeading("Sub Total"),
-                _checkoutDetailSubHeading("\$482"),
+                _checkoutDetailSubHeading(
+                    "\$ ${widget.invoicesByProductsModel?.bill?.items?.forEach((element) {})}"),
               ],
             ),
           ),
@@ -150,7 +155,7 @@ class _CheckOutBottomSheetState extends State<CheckOutBottomSheet> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 _checkoutDetailHeading("Tax (17%)"),
-                _checkoutDetailSubHeading(isEClan?"\$12":"Free",
+                _checkoutDetailSubHeading(isEClan ? "\$12" : "Free",
                     color: const Color(0xffF9B820))
               ],
             ),
@@ -172,16 +177,14 @@ class _CheckOutBottomSheetState extends State<CheckOutBottomSheet> {
               children: [
                 _checkoutDetailHeading("Is this user an eClan Member?"),
                 GestureDetector(
-                  onTap: (){
-                    isEClan=!isEClan;
-                    setState(() {
-
-                    });
-                  },
+                    onTap: () {
+                      isEClan = !isEClan;
+                      setState(() {});
+                    },
                     child: Image.asset(
-                  "images/yes_icon.png",
-                  scale: 3,
-                )),
+                      "images/yes_icon.png",
+                      scale: 3,
+                    )),
               ],
             ),
           ),

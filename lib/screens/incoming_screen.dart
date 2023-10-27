@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pos/screens/drawer_screen.dart';
+import 'package:pos/screens/Tabbar/tab_bar_screen.dart';
 import 'package:pos/utils/constants/app_constants.dart';
 import 'package:pos/utils/constants/font_constants.dart';
 import 'package:pos/widgets/text_field.dart';
@@ -49,15 +49,15 @@ class _IncomingScreenState extends State<IncomingScreen> {
         child: Column(
           children: [
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16,vertical: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
               decoration: BoxDecoration(
                   color: const Color(0xffEAF4DF),
                   borderRadius: BorderRadius.circular(16)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Row(
-                    children: const [
+                  const Row(
+                    children: [
                       Expanded(
                         child: Text(
                           "Product Title / Code",
@@ -114,12 +114,12 @@ class _IncomingScreenState extends State<IncomingScreen> {
                 ],
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Image.asset(
               "images/sacn_image.png",
               scale: 3,
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ListView.separated(
               shrinkWrap: true,
               primary: false,
@@ -148,7 +148,7 @@ class _IncomingScreenState extends State<IncomingScreen> {
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(8),
-                        child: FadeInImage(
+                        child: const FadeInImage(
                           placeholder: AssetImage("images/logo_e.png"),
                           image: NetworkImage(
                               "https://images.unsplash.com/photo-1564216329574-c839d4eedb1b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1272&q=80"),
@@ -163,7 +163,7 @@ class _IncomingScreenState extends State<IncomingScreen> {
                         children: [
                           Row(
                             children: [
-                              Text(
+                              const Text(
                                 "\$ 122",
                                 style: TextStyle(
                                   fontSize: 16,
@@ -172,8 +172,8 @@ class _IncomingScreenState extends State<IncomingScreen> {
                                   fontFamily: FontConstants.bold,
                                 ),
                               ),
-                              SizedBox(width: 4),
-                              Text(
+                              const SizedBox(width: 4),
+                              const Text(
                                 "x 1",
                                 style: TextStyle(
                                   color: Color(0xff969696),
@@ -181,7 +181,7 @@ class _IncomingScreenState extends State<IncomingScreen> {
                                   fontFamily: FontConstants.medium,
                                 ),
                               ),
-                              SizedBox(width: 20),
+                              const SizedBox(width: 20),
                               Text(
                                 "\$ 122",
                                 style: TextStyle(

@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pos/utils/constants/app_constants.dart';
 import 'package:pos/utils/constants/font_constants.dart';
@@ -9,7 +8,8 @@ class ReturnBottomSheet extends StatefulWidget {
   final VoidCallback onButtonPressed;
   final VoidCallback onClose;
 
-  const ReturnBottomSheet({Key? key, required this.onButtonPressed, required this.onClose})
+  const ReturnBottomSheet(
+      {Key? key, required this.onButtonPressed, required this.onClose})
       : super(key: key);
 
   @override
@@ -200,10 +200,10 @@ class _ReturnBottomSheetState extends State<ReturnBottomSheet> {
   Widget buildExchange() => Column(
         children: [
           const SizedBox(height: 16),
-          Padding(
-            padding: const EdgeInsets.only(left: 16.0),
+          const Padding(
+            padding: EdgeInsets.only(left: 16.0),
             child: Row(
-              children: const [
+              children: [
                 Expanded(
                   child: Text(
                     "Product Title / Code",
@@ -248,15 +248,15 @@ class _ReturnBottomSheetState extends State<ReturnBottomSheet> {
                     focusNode: FocusNode(),
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 16,
                 ),
                 ElevatedButton(
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 10, horizontal: 8)),
-                  child: Icon(Icons.add),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 8)),
+                  child: const Icon(Icons.add),
                 )
               ],
             ),

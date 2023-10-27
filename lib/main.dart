@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pos/controller/create_invoice_controller.dart';
+import 'package:pos/controller/invoice_by_product_controller.dart';
+import 'package:pos/controller/login_controller.dart';
 import 'package:pos/screens/splash_screen.dart';
 
 void main() {
@@ -11,6 +14,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Get.put(LoginController());
+    Get.put(CreateInvoiceController());
+    Get.put(InvoiceByProductController());
     return GetMaterialApp(
       title: 'ECart POS',
       theme: ThemeData(
@@ -20,7 +26,8 @@ class MyApp extends StatelessWidget {
               //elevation of button
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8)),
-              padding: const EdgeInsets.symmetric(horizontal: 20,vertical: 16), //content padding inside button
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 20, vertical: 16), //content padding inside button
             ),
           ),
           colorScheme: const ColorScheme(

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pos/screens/drawer_screen.dart';
+import 'package:pos/screens/Tabbar/tab_bar_screen.dart';
 import 'package:pos/utils/constants/app_constants.dart';
 import 'package:pos/utils/constants/font_constants.dart';
 import 'package:pos/widgets/text_field.dart';
@@ -57,9 +57,9 @@ class _MessageScreenState extends State<MessageScreen> {
               scale: 3,
             )),
         elevation: 0,
-        title: Text(
+        title: const Text(
           "Admin",
-          style: const TextStyle(
+          style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
               fontFamily: FontConstants.bold,
@@ -115,7 +115,7 @@ class _MessageScreenState extends State<MessageScreen> {
                           const SizedBox(width: 10),
                           CircleAvatar(
                             radius: 27,
-                            backgroundColor: Color(0xffEAEAEA),
+                            backgroundColor: const Color(0xffEAEAEA),
                             child: CircleAvatar(
                               radius: 25,
                               backgroundColor: Colors.grey.shade400,
@@ -130,7 +130,7 @@ class _MessageScreenState extends State<MessageScreen> {
                         children: [
                           CircleAvatar(
                             radius: 27,
-                            backgroundColor: Color(0xffEAEAEA),
+                            backgroundColor: const Color(0xffEAEAEA),
                             child: CircleAvatar(
                               radius: 25,
                               backgroundColor: Colors.white,

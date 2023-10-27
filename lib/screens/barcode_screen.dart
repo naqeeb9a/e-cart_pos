@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pos/screens/drawer_screen.dart';
+import 'package:pos/screens/Tabbar/tab_bar_screen.dart';
 import 'package:pos/utils/constants/font_constants.dart';
 
 class BarcodeScreen extends StatefulWidget {

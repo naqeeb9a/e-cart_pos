@@ -2,9 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:pos/utils/constants/app_constants.dart';
 import 'package:pos/utils/constants/font_constants.dart';
 
+import '../model/invoice_by_product_model.dart';
+
 class CheckOutScreen extends StatelessWidget {
+  final InvoicesByProductsModel? invoicesByProductsModel;
   final bool isEClan;
-  const CheckOutScreen({Key? key,this.isEClan=true}) : super(key: key);
+  const CheckOutScreen(
+      {Key? key, this.isEClan = true, this.invoicesByProductsModel})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +66,7 @@ class CheckOutScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   _checkoutDetailHeading("Tax (17%)"),
-                  _checkoutDetailSubHeading(isEClan?"\$12":"Free",
+                  _checkoutDetailSubHeading(isEClan ? "\$12" : "Free",
                       color: const Color(0xffF9B820))
                 ],
               ),
@@ -81,9 +86,9 @@ class CheckOutScreen extends StatelessWidget {
                       backgroundColor: const Color(0xffF9B820),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8)),
-                      padding:
-                      const EdgeInsets.symmetric(horizontal: 50, vertical: 10)),
-                  onPressed:(){
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 50, vertical: 10)),
+                  onPressed: () {
                     Navigator.pop(context);
                   },
                   child: const Text(
@@ -158,5 +163,4 @@ class CheckOutScreen extends StatelessWidget {
       ),
     );
   }
-
 }

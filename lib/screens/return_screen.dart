@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pos/screens/drawer_screen.dart';
+import 'package:pos/screens/Tabbar/tab_bar_screen.dart';
 import 'package:pos/utils/constants/app_constants.dart';
 import 'package:pos/utils/constants/font_constants.dart';
 import 'package:pos/widgets/return_bottom.dart';
@@ -47,7 +47,6 @@ class _ReturnScreenState extends State<ReturnScreen> {
               color: Colors.black),
         ),
       ),
-
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -237,7 +236,7 @@ class _ReturnScreenState extends State<ReturnScreen> {
             isFind = true;
             setState(() {});
           },
-          title: Text(
+          title: const Text(
             "Return Amount",
             style: TextStyle(
               color: Colors.black,
@@ -273,7 +272,7 @@ class _ReturnScreenState extends State<ReturnScreen> {
                   ],
                 ),
               ),
-              Text(
+              const Text(
                 "\$482",
                 style: TextStyle(
                   color: Colors.black,
@@ -373,17 +372,14 @@ class _ReturnScreenState extends State<ReturnScreen> {
     );
   }
 
-  returnSheet(){
+  returnSheet() {
     Get.bottomSheet(
-        isDismissible:false,
-        sheet(),
-        barrierColor: Colors.transparent
-    );
+        isDismissible: false, sheet(), barrierColor: Colors.transparent);
   }
 
-  summarySheet(){
+  summarySheet() {
     Get.bottomSheet(
-        isScrollControlled:true,
+        isScrollControlled: true,
         ReturnBottomSheet(
           onButtonPressed: () {
             isFind = false;
@@ -399,8 +395,6 @@ class _ReturnScreenState extends State<ReturnScreen> {
             setState(() {});
           },
         ),
-        barrierColor: Colors.transparent
-    );
+        barrierColor: Colors.transparent);
   }
-
 }

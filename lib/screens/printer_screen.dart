@@ -2,7 +2,7 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pos/model/printer.dart';
-import 'package:pos/screens/drawer_screen.dart';
+import 'package:pos/screens/Tabbar/tab_bar_screen.dart';
 import 'package:pos/utils/constants/app_constants.dart';
 import 'package:pos/utils/constants/font_constants.dart';
 import 'package:pos/widgets/text_field.dart';

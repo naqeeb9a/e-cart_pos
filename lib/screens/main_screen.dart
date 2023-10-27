@@ -1,6 +1,6 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:pos/screens/drawer_screen.dart';
 import 'package:pos/screens/incoming_screen.dart';
 import 'package:pos/screens/outgoing_screen.dart';
 import 'package:pos/screens/return_screen.dart';
@@ -9,9 +9,10 @@ import 'package:pos/utils/constants/app_constants.dart';
 
 import '../utils/constants/font_constants.dart';
 
-final StreamController<int> streamController = StreamController<int>.broadcast();
-class MainScreen extends StatefulWidget {
+final StreamController<int> streamController =
+    StreamController<int>.broadcast();
 
+class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
 
   @override
@@ -19,14 +20,13 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-
   List _tabs = [];
   late StreamSubscription<int> streamSubscription;
   @override
   void initState() {
     streamSubscription = streamController.stream.listen((value) {
       controller!.jumpToPage(value);
-      currentTab=value;
+      currentTab = value;
       if (mounted) setState(() {});
     });
 
