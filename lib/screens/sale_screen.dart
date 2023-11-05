@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:get/get.dart';
+import 'package:pos/controller/create_invoice_controller.dart';
 import 'package:pos/controller/invoice_by_product_controller.dart';
 import 'package:pos/screens/Tabbar/tab_bar_screen.dart';
 import 'package:pos/screens/checkout_screen.dart';
@@ -37,7 +38,7 @@ class _SaleScreenState extends State<SaleScreen> {
         backgroundColor: Colors.white,
         leading: IconButton(
             onPressed: () {
-              scaffoldKey.currentState!.openDrawer();
+              scaffoldKey.currentState?.openDrawer();
             },
             icon: Image.asset(
               "images/drawer_icon.png",
@@ -151,6 +152,10 @@ class _SaleScreenState extends State<SaleScreen> {
                   itemBuilder: (_, int index) {
                     InvoiceItem? item = invoiceByProductController
                         .invoicesByProductsModel?.bill?.items?[index];
+                    Future.delayed(
+                        600.milliseconds,
+                        () => bottomSheet(invoiceByProductController
+                            .invoicesByProductsModel));
                     return InkWell(
                       onTap: () {
                         bottomSheet(
@@ -348,6 +353,7 @@ class _SaleScreenState extends State<SaleScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
                       onPressed: () {
+                        Get.find<InvoiceByProductController>().reset();
                         Navigator.pop(context);
                       },
                       child: const Text(
@@ -373,14 +379,27 @@ class _SaleScreenState extends State<SaleScreen> {
         isDismissible: false,
         CheckOutBottomSheet(
           onButtonPressed: () {
-            Navigator.push(
+            Get.find<CreateInvoiceController>().createInvoice({
+              "products": [
+                {
+                  "code_or_title":
+                      invoicesByProductsModel?.bill?.items?.first.name,
+                  "quantity":
+                      invoicesByProductsModel?.bill?.items?.first.quantity,
+                },
+              ],
+            }).then((value) {
+              if (value == true) {
+                Navigator.push(
                     context,
                     MaterialPageRoute(
                         builder: (BuildContext context) => CheckOutScreen(
-                            invoicesByProductsModel: invoicesByProductsModel)))
-                .then((_) {
-              isAdded = false;
-              setState(() {});
+                            invoicesByProductsModel:
+                                invoicesByProductsModel))).then((_) {
+                  Navigator.pop(context);
+                  Get.find<InvoiceByProductController>().reset();
+                });
+              }
             });
           },
           invoicesByProductsModel: invoicesByProductsModel,

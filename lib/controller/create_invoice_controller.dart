@@ -30,10 +30,11 @@ class CreateInvoiceController extends GetxController {
         }).then((response) {
       if (response.statusCode == 200) {
         createInvoiceModel = createInvoiceModelFromJson(response.body);
+
         setLoading();
         return true;
       } else {
-        Fluttertoast.showToast(msg: "unable to login");
+        Fluttertoast.showToast(msg: "unable to create invoic");
         setLoading();
         return false;
       }

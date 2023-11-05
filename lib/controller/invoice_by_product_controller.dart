@@ -8,10 +8,16 @@ import 'package:pos/model/invoice_by_product_model.dart';
 import 'package:pos/utils/utills.dart';
 
 class InvoiceByProductController extends GetxController {
+  // final List items = [];
   bool loading = false;
   InvoicesByProductsModel? invoicesByProductsModel;
   setLoading() {
     loading = !loading;
+    update();
+  }
+
+  reset() {
+    invoicesByProductsModel = null;
     update();
   }
 
@@ -31,6 +37,7 @@ class InvoiceByProductController extends GetxController {
       if (response.statusCode == 200) {
         invoicesByProductsModel =
             invoicesByProductsModelFromJson(response.body);
+        // items.addAll(invoicesByProductsModel?.bill?.items ?? []);
         setLoading();
         return true;
       } else {

@@ -1,11 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:pos/controller/add_incoming_stock.dart';
+import 'package:pos/controller/add_outgoing_stock.dart';
 import 'package:pos/controller/create_invoice_controller.dart';
+import 'package:pos/controller/invoice_by_number_controller.dart';
 import 'package:pos/controller/invoice_by_product_controller.dart';
 import 'package:pos/controller/login_controller.dart';
+import 'package:pos/controller/message_controller.dart';
+import 'package:pos/controller/profile%20controller/profile_controller.dart';
+import 'package:pos/controller/stores_controller.dart';
+import 'package:pos/controller/threads_controller.dart';
 import 'package:pos/screens/splash_screen.dart';
+import 'package:pos/utils/global.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations(
+    [DeviceOrientation.portraitUp],
+  );
+  await Global.init();
   runApp(const MyApp());
 }
 
@@ -17,6 +31,13 @@ class MyApp extends StatelessWidget {
     Get.put(LoginController());
     Get.put(CreateInvoiceController());
     Get.put(InvoiceByProductController());
+    Get.put(InvoiceByNumberController());
+    Get.put(AddIncomingStockController());
+    Get.put(AddOutgoingStockController());
+    Get.put(StoreController());
+    Get.put(LoadProfileController());
+    Get.put(ThreadsController());
+    Get.put(MessageController());
     return GetMaterialApp(
       title: 'ECart POS',
       theme: ThemeData(

@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pos/controller/invoice_by_number_controller.dart';
 import 'package:pos/screens/Tabbar/tab_bar_screen.dart';
 import 'package:pos/utils/constants/app_constants.dart';
 import 'package:pos/utils/constants/font_constants.dart';
 import 'package:pos/widgets/return_bottom.dart';
 import 'package:pos/widgets/text_field.dart';
+
+import '../model/invoice_by_number_model.dart';
 
 class ReturnScreen extends StatefulWidget {
   const ReturnScreen({Key? key}) : super(key: key);
@@ -14,7 +17,7 @@ class ReturnScreen extends StatefulWidget {
 }
 
 class _ReturnScreenState extends State<ReturnScreen> {
-  TextEditingController invoice = TextEditingController();
+  TextEditingController invoice = TextEditingController(text: "989602984");
   FocusNode invoiceNode = FocusNode();
   bool isFind = false;
   bool showReturnAmount = false;
@@ -47,170 +50,183 @@ class _ReturnScreenState extends State<ReturnScreen> {
               color: Colors.black),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-              decoration: BoxDecoration(
-                  color: const Color(0xffEAF4DF),
-                  borderRadius: BorderRadius.circular(16)),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const Text(
-                    "Invoice No.",
-                    style: TextStyle(
-                        fontFamily: FontConstants.bold,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black),
-                  ),
-                  const SizedBox(height: 16),
-                  textField(
-                    textInputAction: TextInputAction.next,
-                    hintText: "e.g. 2713890",
-                    controller: invoice,
-                    focusNode: invoiceNode,
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                      onPressed: () {
-                        returnSheet();
-                        showReturnAmount = true;
-                        setState(() {});
-                      },
-                      child: const Text(
-                        "Find",
-                        style: TextStyle(
-                            fontFamily: FontConstants.medium,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white),
-                      ))
-                ],
-              ),
+      body: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+            decoration: BoxDecoration(
+                color: const Color(0xffEAF4DF),
+                borderRadius: BorderRadius.circular(16)),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Text(
+                  "Invoice No.",
+                  style: TextStyle(
+                      fontFamily: FontConstants.bold,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black),
+                ),
+                const SizedBox(height: 16),
+                textField(
+                  textInputAction: TextInputAction.next,
+                  hintText: "e.g. 2713890",
+                  controller: invoice,
+                  focusNode: invoiceNode,
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                    onPressed: () {
+                      Get.find<InvoiceByNumberController>()
+                          .getInvoiceByNumber(invoice.text);
+                    },
+                    child: const Text(
+                      "Find",
+                      style: TextStyle(
+                          fontFamily: FontConstants.medium,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white),
+                    ))
+              ],
             ),
-            if (!showReturnAmount && !isFind)
-              SizedBox(height: MediaQuery.of(context).size.height * 0.15),
-            if (!showReturnAmount && !isFind)
-              Image.asset(
-                "images/sacn_image.png",
-                scale: 3,
-              ),
-            if (isFind || showReturnAmount) const SizedBox(height: 20),
-            if (isFind || showReturnAmount)
-              ListView.separated(
-                shrinkWrap: true,
-                primary: false,
-                itemCount: 1,
-                separatorBuilder: (_, int index) => const SizedBox(height: 16),
-                itemBuilder: (_, int index) => Container(
-                  padding: const EdgeInsets.all(13),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(
-                      color: const Color(0xffF3F2F4),
-                    ),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 90,
-                        height: 74,
+          ),
+          Expanded(
+            child: GetBuilder<InvoiceByNumberController>(
+              builder: (invoiceByNumberController) {
+                if (invoiceByNumberController.loading) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (invoiceByNumberController.invoiceByNumberModel == null) {
+                  return Image.asset(
+                    "images/sacn_image.png",
+                    scale: 3,
+                  );
+                }
+                return ListView.separated(
+                  itemCount: invoiceByNumberController
+                          .invoiceByNumberModel?.bill?.items?.length ??
+                      0,
+                  separatorBuilder: (_, int index) =>
+                      const SizedBox(height: 16),
+                  itemBuilder: (_, int index) {
+                    InvoiceItem? invoiceItem = invoiceByNumberController
+                        .invoiceByNumberModel?.bill?.items?[index];
+                    Future.delayed(
+                        600.milliseconds, () => returnSheet(invoiceItem));
+                    return InkWell(
+                      onTap: () => returnSheet(invoiceItem),
+                      child: Container(
+                        padding: const EdgeInsets.all(13),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           border: Border.all(
                             color: const Color(0xffF3F2F4),
                           ),
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(20),
                         ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: const FadeInImage(
-                            placeholder: AssetImage("images/logo_e.png"),
-                            image: NetworkImage(
-                                "https://images.unsplash.com/photo-1564216329574-c839d4eedb1b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1272&q=80"),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        child: Row(
                           children: [
-                            Row(
-                              children: [
-                                const Text(
-                                  "\$ 122",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: FontConstants.bold,
-                                  ),
+                            Container(
+                              width: 90,
+                              height: 74,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                border: Border.all(
+                                  color: const Color(0xffF3F2F4),
                                 ),
-                                const SizedBox(width: 4),
-                                const Text(
-                                  "x 1",
-                                  style: TextStyle(
-                                    color: Color(0xff969696),
-                                    fontWeight: FontWeight.w500,
-                                    fontFamily: FontConstants.medium,
-                                  ),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: const FadeInImage(
+                                  placeholder: AssetImage("images/logo_e.png"),
+                                  image: NetworkImage(
+                                      "https://images.unsplash.com/photo-1564216329574-c839d4eedb1b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1272&q=80"),
+                                  fit: BoxFit.cover,
                                 ),
-                                const SizedBox(width: 20),
-                                Text(
-                                  "\$ 122",
-                                  style: TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: FontConstants.bold,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Text(
+                                        "\$ ${invoiceItem?.unitPrice}",
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold,
+                                          fontFamily: FontConstants.bold,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        "x ${invoiceItem?.quantity}",
+                                        style: const TextStyle(
+                                          color: Color(0xff969696),
+                                          fontWeight: FontWeight.w500,
+                                          fontFamily: FontConstants.medium,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 20),
+                                      Text(
+                                        "\$ ${(invoiceItem?.unitPrice ?? 0) * (invoiceItem?.quantity ?? 0)}",
+                                        style: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary,
+                                          fontWeight: FontWeight.bold,
+                                          fontFamily: FontConstants.bold,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ),
-                              ],
+                                  const SizedBox(height: 13),
+                                  Text(
+                                    invoiceItem?.product ?? "",
+                                    maxLines: 1,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                        overflow: TextOverflow.ellipsis,
+                                        fontFamily: FontConstants.medium,
+                                        color: Color(0xff1B7575)),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    "ID # ${invoiceItem?.id}",
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 12,
+                                        fontFamily: FontConstants.medium,
+                                        color: Color(0xff2C3630)),
+                                  ),
+                                ],
+                              ),
                             ),
-                            const SizedBox(height: 13),
-                            const Text(
-                              "MacBook Pro 13-in (M1,2020)",
-                              maxLines: 1,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  overflow: TextOverflow.ellipsis,
-                                  fontFamily: FontConstants.medium,
-                                  color: Color(0xff1B7575)),
-                            ),
-                            const SizedBox(height: 2),
-                            const Text(
-                              "ID # 219387",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 12,
-                                  fontFamily: FontConstants.medium,
-                                  color: Color(0xff2C3630)),
-                            ),
+                            const SizedBox(width: 4),
+                            IconButton(
+                                onPressed: () {
+                                  _deleteDialog();
+                                },
+                                icon: Image.asset("images/delete_icon.png")),
                           ],
                         ),
                       ),
-                      const SizedBox(width: 4),
-                      IconButton(
-                          onPressed: () {
-                            _deleteDialog();
-                          },
-                          icon: Image.asset("images/delete_icon.png")),
-                    ],
-                  ),
-                ),
-              ),
-          ],
-        ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget sheet() => Container(
+  Widget sheet(InvoiceItem? invoiceItem) => Container(
         width: double.infinity,
         padding: const EdgeInsets.only(top: 30, right: 20, bottom: 30),
         decoration: BoxDecoration(
@@ -231,7 +247,7 @@ class _ReturnScreenState extends State<ReturnScreen> {
         child: ListTile(
           onTap: () {
             Get.back();
-            summarySheet();
+            summarySheet(invoiceItem);
             showReturnAmount = false;
             isFind = true;
             setState(() {});
@@ -272,9 +288,9 @@ class _ReturnScreenState extends State<ReturnScreen> {
                   ],
                 ),
               ),
-              const Text(
-                "\$482",
-                style: TextStyle(
+              Text(
+                "\$${Get.find<InvoiceByNumberController>().invoiceByNumberModel?.bill?.total}",
+                style: const TextStyle(
                   color: Colors.black,
                   fontWeight: FontWeight.bold,
                   fontFamily: "Inter-Bold",
@@ -352,6 +368,7 @@ class _ReturnScreenState extends State<ReturnScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
                       onPressed: () {
+                        Get.find<InvoiceByNumberController>().reset();
                         Navigator.pop(context);
                       },
                       child: const Text(
@@ -372,12 +389,14 @@ class _ReturnScreenState extends State<ReturnScreen> {
     );
   }
 
-  returnSheet() {
+  returnSheet(InvoiceItem? invoiceItem) {
     Get.bottomSheet(
-        isDismissible: false, sheet(), barrierColor: Colors.transparent);
+        isDismissible: false,
+        sheet(invoiceItem),
+        barrierColor: Colors.transparent);
   }
 
-  summarySheet() {
+  summarySheet(InvoiceItem? invoiceItem) {
     Get.bottomSheet(
         isScrollControlled: true,
         ReturnBottomSheet(
@@ -389,7 +408,7 @@ class _ReturnScreenState extends State<ReturnScreen> {
           },
           onClose: () {
             Get.back();
-            returnSheet();
+            returnSheet(invoiceItem);
             isFind = false;
             showReturnAmount = true;
             setState(() {});

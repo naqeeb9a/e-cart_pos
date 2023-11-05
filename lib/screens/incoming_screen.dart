@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:pos/controller/add_incoming_stock.dart';
 import 'package:pos/screens/Tabbar/tab_bar_screen.dart';
 import 'package:pos/utils/constants/app_constants.dart';
 import 'package:pos/utils/constants/font_constants.dart';
 import 'package:pos/widgets/text_field.dart';
+
+import '../model/add_incoming_stock_model.dart';
 
 class IncomingScreen extends StatefulWidget {
   const IncomingScreen({Key? key}) : super(key: key);
@@ -28,7 +32,7 @@ class _IncomingScreenState extends State<IncomingScreen> {
         backgroundColor: Colors.white,
         leading: IconButton(
             onPressed: () {
-              scaffoldKey.currentState!.openDrawer();
+              scaffoldKey.currentState?.openDrawer();
             },
             icon: Image.asset(
               "images/drawer_icon.png",
@@ -44,188 +48,214 @@ class _IncomingScreenState extends State<IncomingScreen> {
               color: Colors.black),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-              decoration: BoxDecoration(
-                  color: const Color(0xffEAF4DF),
-                  borderRadius: BorderRadius.circular(16)),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          "Product Title / Code",
-                          style: TextStyle(
-                              fontFamily: FontConstants.bold,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black),
-                        ),
-                      ),
-                      SizedBox(width: 16),
-                      Expanded(
-                        child: Text(
-                          "Quantity",
-                          style: TextStyle(
-                              fontFamily: FontConstants.bold,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: textField(
-                          textInputAction: TextInputAction.next,
-                          hintText: "e.g. 2713890",
-                          controller: title,
-                          focusNode: titleNode,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: textField(
-                          textInputAction: TextInputAction.done,
-                          hintText: "e.g. 2",
-                          controller: quantity,
-                          focusNode: quantityNode,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                      onPressed: () {},
-                      child: const Text(
-                        "Add to Incoming Stock",
-                        style: TextStyle(
-                            fontFamily: FontConstants.medium,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white),
-                      ))
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-            Image.asset(
-              "images/sacn_image.png",
-              scale: 3,
-            ),
-            const SizedBox(height: 20),
-            ListView.separated(
-              shrinkWrap: true,
-              primary: false,
-              itemCount: 1,
-              separatorBuilder: (_, int index) => const SizedBox(height: 16),
-              itemBuilder: (_, int index) => Container(
-                padding: const EdgeInsets.all(13),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(
-                    color: const Color(0xffF3F2F4),
-                  ),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Row(
+      body: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+            decoration: BoxDecoration(
+                color: const Color(0xffEAF4DF),
+                borderRadius: BorderRadius.circular(16)),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Row(
                   children: [
-                    Container(
-                      width: 90,
-                      height: 74,
+                    Expanded(
+                      child: Text(
+                        "Product Title / Code",
+                        style: TextStyle(
+                            fontFamily: FontConstants.bold,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black),
+                      ),
+                    ),
+                    SizedBox(width: 16),
+                    Expanded(
+                      child: Text(
+                        "Quantity",
+                        style: TextStyle(
+                            fontFamily: FontConstants.bold,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: textField(
+                        textInputAction: TextInputAction.next,
+                        hintText: "e.g. 2713890",
+                        controller: title,
+                        focusNode: titleNode,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: textField(
+                        textInputAction: TextInputAction.done,
+                        hintText: "e.g. 2",
+                        controller: quantity,
+                        focusNode: quantityNode,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                    onPressed: () {
+                      Get.find<AddIncomingStockController>().addIncomingStock({
+                        "products": [
+                          {
+                            "code_or_title": title.text,
+                            "quantity": quantity.text
+                          }
+                        ]
+                      });
+                    },
+                    child: const Text(
+                      "Add to Incoming Stock",
+                      style: TextStyle(
+                          fontFamily: FontConstants.medium,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white),
+                    ))
+              ],
+            ),
+          ),
+          Expanded(
+            child: GetBuilder<AddIncomingStockController>(
+              builder: (addIncomingStockController) {
+                if (addIncomingStockController.loading) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                if (addIncomingStockController.addIncomingStockModel == null) {
+                  return Center(
+                    child: Image.asset(
+                      "images/sacn_image.png",
+                      scale: 3,
+                    ),
+                  );
+                }
+                return ListView.separated(
+                  itemCount: addIncomingStockController
+                          .addIncomingStockModel?.productsArray?.length ??
+                      0,
+                  separatorBuilder: (_, int index) =>
+                      const SizedBox(height: 16),
+                  itemBuilder: (_, int index) {
+                    ProductsArray? productsArray = addIncomingStockController
+                        .addIncomingStockModel?.productsArray?[index];
+                    return Container(
+                      padding: const EdgeInsets.all(13),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         border: Border.all(
                           color: const Color(0xffF3F2F4),
                         ),
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(20),
                       ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: const FadeInImage(
-                          placeholder: AssetImage("images/logo_e.png"),
-                          image: NetworkImage(
-                              "https://images.unsplash.com/photo-1564216329574-c839d4eedb1b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1272&q=80"),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Row(
                         children: [
-                          Row(
-                            children: [
-                              const Text(
-                                "\$ 122",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontFamily: FontConstants.bold,
-                                ),
+                          Container(
+                            width: 90,
+                            height: 74,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              border: Border.all(
+                                color: const Color(0xffF3F2F4),
                               ),
-                              const SizedBox(width: 4),
-                              const Text(
-                                "x 1",
-                                style: TextStyle(
-                                  color: Color(0xff969696),
-                                  fontWeight: FontWeight.w500,
-                                  fontFamily: FontConstants.medium,
-                                ),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: const FadeInImage(
+                                placeholder: AssetImage("images/logo_e.png"),
+                                image: NetworkImage(
+                                    "https://images.unsplash.com/photo-1564216329574-c839d4eedb1b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1272&q=80"),
+                                fit: BoxFit.cover,
                               ),
-                              const SizedBox(width: 20),
-                              Text(
-                                "\$ 122",
-                                style: TextStyle(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  fontWeight: FontWeight.bold,
-                                  fontFamily: FontConstants.bold,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    const Text(
+                                      "\$ 122",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                        fontFamily: FontConstants.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      "x ${productsArray?.quantity}",
+                                      style: const TextStyle(
+                                        color: Color(0xff969696),
+                                        fontWeight: FontWeight.w500,
+                                        fontFamily: FontConstants.medium,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 20),
+                                    Text(
+                                      "\$ 122",
+                                      style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                        fontWeight: FontWeight.bold,
+                                        fontFamily: FontConstants.bold,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            ],
+                                const SizedBox(height: 13),
+                                Text(
+                                  productsArray?.name ?? "",
+                                  maxLines: 1,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      overflow: TextOverflow.ellipsis,
+                                      fontFamily: FontConstants.medium,
+                                      color: Color(0xff1B7575)),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  "ID # ${productsArray?.productsArrayId}",
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 12,
+                                      fontFamily: FontConstants.medium,
+                                      color: Color(0xff2C3630)),
+                                ),
+                              ],
+                            ),
                           ),
-                          const SizedBox(height: 13),
-                          const Text(
-                            "MacBook Pro 13-in (M1,2020)",
-                            maxLines: 1,
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                overflow: TextOverflow.ellipsis,
-                                fontFamily: FontConstants.medium,
-                                color: Color(0xff1B7575)),
-                          ),
-                          const SizedBox(height: 2),
-                          const Text(
-                            "ID # 219387",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 12,
-                                fontFamily: FontConstants.medium,
-                                color: Color(0xff2C3630)),
-                          ),
+                          const SizedBox(width: 4),
+                          IconButton(
+                              onPressed: () {
+                                _deleteDialog();
+                              },
+                              icon: Image.asset("images/delete_icon.png")),
                         ],
                       ),
-                    ),
-                    const SizedBox(width: 4),
-                    IconButton(
-                        onPressed: () {
-                          _deleteDialog();
-                        },
-                        icon: Image.asset("images/delete_icon.png")),
-                  ],
-                ),
-              ),
+                    );
+                  },
+                );
+              },
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -296,6 +326,7 @@ class _IncomingScreenState extends State<IncomingScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
                       onPressed: () {
+                        Get.find<AddIncomingStockController>().reset();
                         Navigator.pop(context);
                       },
                       child: const Text(

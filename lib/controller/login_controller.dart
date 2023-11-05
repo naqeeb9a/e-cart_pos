@@ -4,11 +4,18 @@ import 'package:http/http.dart' as http;
 import 'package:pos/model/login_model.dart';
 import 'package:pos/utils/utills.dart';
 
+import '../utils/global.dart';
+
 class LoginController extends GetxController {
   bool loading = false;
   LoginModel? loginModel;
   setLoading() {
     loading = !loading;
+    update();
+  }
+
+  setLoginModel(LoginModel? updatedloginModel) {
+    loginModel = updatedloginModel;
     update();
   }
 
@@ -18,6 +25,7 @@ class LoginController extends GetxController {
         body: {"email": email, "password": password}).then((response) {
       if (response.statusCode == 200) {
         loginModel = loginModelFromJson(response.body);
+        Global.storageService.setAuthenticationModelString(response.body);
         setLoading();
         return true;
       } else {

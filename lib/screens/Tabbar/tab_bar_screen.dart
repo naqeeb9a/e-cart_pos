@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:pos/screens/barcode_screen.dart';
 import 'package:pos/screens/main_screen.dart';
 import 'package:pos/screens/printer_screen.dart';
+import 'package:pos/screens/splash_screen.dart';
 import 'package:pos/screens/support_screen.dart';
 import 'package:pos/utils/constants/app_constants.dart';
 import 'package:pos/utils/constants/font_constants.dart';
+
+import '../../utils/global.dart';
 
 final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -25,6 +28,20 @@ class _DrawerScreenState extends State<DrawerScreen> {
       {"icon": "support", "title": AppConstants.support},
       {"icon": "printer", "title": AppConstants.printer},
       {"icon": "barcode", "title": AppConstants.barcodeScanner},
+      {
+        "icon": "return",
+        "title": "logout",
+        "onTap": () {
+          Global.storageService
+              .removeUser()
+              .then((value) => Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SplashScreen(),
+                  ),
+                  (route) => false));
+        }
+      },
     ];
     super.initState();
   }
@@ -47,7 +64,7 @@ class _DrawerScreenState extends State<DrawerScreen> {
       case 0:
         return const MainScreen();
       case 1:
-        return const MessageScreen();
+        return const SupportScreen();
       case 2:
         return const PrinterScreen();
       case 3:
@@ -73,12 +90,15 @@ class _DrawerScreenState extends State<DrawerScreen> {
                     alignment: Alignment.topLeft,
                     child: IconButton(
                         onPressed: () {
-                          scaffoldKey.currentState!.closeDrawer();
+                          scaffoldKey.currentState?.closeDrawer();
                         },
                         icon: Image.asset("images/green_back_icon.png")),
                   ),
                   const SizedBox(height: 16),
-                  Image.asset("images/logo_e.png",scale: 3,)
+                  Image.asset(
+                    "images/logo_e.png",
+                    scale: 3,
+                  )
                 ],
               ),
             ),
@@ -102,7 +122,8 @@ class _DrawerScreenState extends State<DrawerScreen> {
                   fontFamily: FontConstants.regular,
                 ),
               ),
-            ),const SizedBox(height: 25),
+            ),
+            const SizedBox(height: 25),
           ],
         ),
       );
@@ -111,14 +132,15 @@ class _DrawerScreenState extends State<DrawerScreen> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
         ),
-        onTap: () {
-          scaffoldKey.currentState!.closeDrawer();
-          if (mounted) {
-            setState(() {
-              selectedDrawer = index;
-            });
-          }
-        },
+        onTap: _userOptions[index]["onTap"] ??
+            () {
+              scaffoldKey.currentState?.closeDrawer();
+              if (mounted) {
+                setState(() {
+                  selectedDrawer = index;
+                });
+              }
+            },
         minLeadingWidth: 30,
         leading: Image.asset(
           "images/${_userOptions[index]["icon"]}_icon.png",

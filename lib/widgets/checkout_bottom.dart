@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pos/controller/create_invoice_controller.dart';
 import 'package:pos/utils/constants/app_constants.dart';
 import 'package:pos/utils/constants/font_constants.dart';
 
@@ -47,24 +48,30 @@ class _CheckOutBottomSheetState extends State<CheckOutBottomSheet> {
           _buildCheckOutDetails(),
           ListTile(
             contentPadding: EdgeInsets.zero,
-            trailing: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xffF9B820),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8)),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 30, vertical: 10)),
-              onPressed: widget.onButtonPressed,
-              child: const Text(
-                "Checkout",
-                style: TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.w500,
-                  fontFamily: "Inter-Medium",
-                  fontSize: 16,
+            trailing: GetBuilder<CreateInvoiceController>(
+                builder: (createInvoiceController) {
+              if (createInvoiceController.loading) {
+                return const CircularProgressIndicator();
+              }
+              return ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xffF9B820),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8)),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 30, vertical: 10)),
+                onPressed: widget.onButtonPressed,
+                child: const Text(
+                  "Checkout",
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w500,
+                    fontFamily: "Inter-Medium",
+                    fontSize: 16,
+                  ),
                 ),
-              ),
-            ),
+              );
+            }),
             leading: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -99,9 +106,9 @@ class _CheckOutBottomSheetState extends State<CheckOutBottomSheet> {
                 ],
               ),
             ),
-            subtitle: const Text(
-              "\$482",
-              style: TextStyle(
+            subtitle: Text(
+              "\$ ${widget.invoicesByProductsModel?.bill?.total ?? 0}",
+              style: const TextStyle(
                 color: Colors.black,
                 fontWeight: FontWeight.bold,
                 fontFamily: "Inter-Bold",
@@ -114,90 +121,104 @@ class _CheckOutBottomSheetState extends State<CheckOutBottomSheet> {
     );
   }
 
-  Widget _buildCheckOutDetails() => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ListTile(
-            contentPadding: const EdgeInsets.only(left: 16, right: 0),
-            title: const Text(
-              AppConstants.billSummary,
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-                fontFamily: "Inter-Bold",
-              ),
-            ),
-            trailing: IconButton(
-              onPressed: () {
-                Get.back();
-              },
-              icon: const Icon(
-                Icons.cancel,
-                color: Colors.black,
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _checkoutDetailHeading("Sub Total"),
-                _checkoutDetailSubHeading(
-                    "\$ ${widget.invoicesByProductsModel?.bill?.items?.forEach((element) {})}"),
-              ],
+  Widget _buildCheckOutDetails() {
+    double? discountPrice = (widget.invoicesByProductsModel?.bill?.items
+            ?.map((e) => (e.priceDiscount ?? 0))
+            .toList()
+            .fold(0,
+                (previousValue, element) => (previousValue ?? 0) + element) ??
+        0);
+    double? subTotal = (widget.invoicesByProductsModel?.bill?.items
+            ?.map((e) => (e.price ?? 0) * (e.quantity ?? 0))
+            .toList()
+            .fold(0,
+                (previousValue, element) => (previousValue ?? 0) + element) ??
+        0);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ListTile(
+          contentPadding: const EdgeInsets.only(left: 16, right: 0),
+          title: const Text(
+            AppConstants.billSummary,
+            style: TextStyle(
+              fontSize: 18,
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+              fontFamily: "Inter-Bold",
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(left: 16.0, top: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _checkoutDetailHeading("Tax (17%)"),
-                _checkoutDetailSubHeading(isEClan ? "\$12" : "Free",
-                    color: const Color(0xffF9B820))
-              ],
+          trailing: IconButton(
+            onPressed: () {
+              Get.back();
+            },
+            icon: const Icon(
+              Icons.cancel,
+              color: Colors.black,
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(left: 16.0, top: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _checkoutDetailHeading("Discount Price"),
-                _checkoutDetailSubHeading("\$12"),
-              ],
-            ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 16.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _checkoutDetailHeading("Sub Total"),
+              _checkoutDetailSubHeading("\$ $subTotal"),
+            ],
           ),
-          Padding(
-            padding: const EdgeInsets.only(left: 16.0, top: 16, bottom: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _checkoutDetailHeading("Is this user an eClan Member?"),
-                GestureDetector(
-                    onTap: () {
-                      isEClan = !isEClan;
-                      setState(() {});
-                    },
-                    child: Image.asset(
-                      "images/yes_icon.png",
-                      scale: 3,
-                    )),
-              ],
-            ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 16.0, top: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _checkoutDetailHeading("Tax (17%)"),
+              _checkoutDetailSubHeading(
+                  isEClan ? "\$${subTotal * (17 / 100)}" : "Free",
+                  color: const Color(0xffF9B820))
+            ],
           ),
-          if (isEClan)
-            const Padding(
-              padding: EdgeInsets.only(left: 6.0),
-              child: Icon(
-                CupertinoIcons.qrcode,
-                size: 70,
-              ),
-            )
-        ],
-      );
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 16.0, top: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _checkoutDetailHeading("Discount Price"),
+              _checkoutDetailSubHeading(discountPrice.toString()),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 16.0, top: 16, bottom: 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _checkoutDetailHeading("Is this user an eClan Member?"),
+              GestureDetector(
+                  onTap: () {
+                    isEClan = !isEClan;
+                    setState(() {});
+                  },
+                  child: Image.asset(
+                    "images/yes_icon.png",
+                    scale: 3,
+                  )),
+            ],
+          ),
+        ),
+        if (isEClan)
+          const Padding(
+            padding: EdgeInsets.only(left: 6.0),
+            child: Icon(
+              CupertinoIcons.qrcode,
+              size: 70,
+            ),
+          )
+      ],
+    );
+  }
 
   Text _checkoutDetailHeading(String title) {
     return Text(

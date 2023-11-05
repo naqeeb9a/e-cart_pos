@@ -1,43 +1,59 @@
 import 'package:flutter/material.dart';
-import 'package:pos/screens/Tabbar/tab_bar_screen.dart';
-import 'package:pos/utils/constants/app_constants.dart';
-import 'package:pos/utils/constants/font_constants.dart';
-import 'package:pos/widgets/text_field.dart';
+import 'package:get/get.dart';
+import 'package:socket_io_client/socket_io_client.dart' as socket_io_client;
 
-class MessageScreen extends StatefulWidget {
-  const MessageScreen({Key? key}) : super(key: key);
+import '../controller/login_controller.dart';
+import '../controller/message_controller.dart';
+import '../controller/threads_controller.dart';
+import '../utils/constants/app_constants.dart';
+import '../utils/constants/font_constants.dart';
+import '../widgets/text_field.dart';
+import 'Tabbar/tab_bar_screen.dart';
+
+class SupportScreen extends StatefulWidget {
+  const SupportScreen({Key? key}) : super(key: key);
 
   @override
-  State<MessageScreen> createState() => _MessageScreenState();
+  State<SupportScreen> createState() => _SupportScreenState();
 }
 
-class _MessageScreenState extends State<MessageScreen> {
-  TextEditingController messageController = TextEditingController();
+class _SupportScreenState extends State<SupportScreen> {
+  TextEditingController sendMessageController = TextEditingController();
   FocusNode messageNode = FocusNode();
+  late socket_io_client.Socket socket;
+  LoginController loginController = Get.find();
+  ThreadsController threadsController = Get.find();
+  MessageController messageController = Get.find();
+  @override
+  void initState() {
+    connect();
+    super.initState();
+  }
 
-  final List _messages = [
-    {"message": "Hi, Will you tell me something?", "isMe": false},
-    {"message": "Yes Please", "isMe": true},
-    {
-      "message":
-          "It was great pleasure to work with Kimberly and Redfin team to make the sale go thru. Kimberly took extra efforts to get everything setup correctly for sale and organizing open houses. I am really impressed with Kimberly’s quick response to any call or text. I will highly recommend her. And above all I recommend Redfin for updating Dashboard regularly that I could watch remotely.",
-      "isMe": false
-    },
-    {"message": "Hi, Will you tell me something?", "isMe": false},
-    {"message": "Yes Please", "isMe": true},
-    {
-      "message":
-          "It was great pleasure to work with Kimberly and Redfin team to make the sale go thru. Kimberly took extra efforts to get everything setup correctly for sale and organizing open houses. I am really impressed with Kimberly’s quick response to any call or text. I will highly recommend her. And above all I recommend Redfin for updating Dashboard regularly that I could watch remotely.",
-      "isMe": false
-    },
-    {"message": "Hi, Will you tell me something?", "isMe": false},
-    {"message": "Yes Please", "isMe": true},
-    {
-      "message":
-          "It was great pleasure to work with Kimberly and Redfin team to make the sale go thru. Kimberly took extra efforts to get everything setup correctly for sale and organizing open houses. I am really impressed with Kimberly’s quick response to any call or text. I will highly recommend her. And above all I recommend Redfin for updating Dashboard regularly that I could watch remotely.",
-      "isMe": false
-    },
-  ];
+  void connect() {
+    threadsController
+        .getThreads(loginController.loginModel?.user?.chatToken ?? "")
+        .then((value) {
+      if (value == true) {
+        messageController.getMessages(
+            threadsController.threadsModel?.first.id.toString() ?? "",
+            loginController.loginModel?.tokens?.accessToken ?? "",
+            loginController.loginModel?.user?.chatToken ?? "");
+      }
+    });
+    socket = socket_io_client.io(
+        "http://34.254.211.149:3000?chat_token=${loginController.loginModel?.user?.chatToken}",
+        {
+          "transports": ["websocket"],
+          "autoconnect": false
+        });
+    socket.connect();
+    socket.onConnect((data) {
+      socket.on("message", (data) {
+        messageController.addNewMessage(data);
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,18 +63,19 @@ class _MessageScreenState extends State<MessageScreen> {
         iconTheme: const IconThemeData(
           color: Colors.black, //change your color here
         ),
-        backgroundColor: Colors.white,
         leading: IconButton(
             onPressed: () {
-              scaffoldKey.currentState!.openDrawer();
+              scaffoldKey.currentState?.openDrawer();
             },
             icon: Image.asset(
               "images/drawer_icon.png",
               scale: 3,
             )),
+        automaticallyImplyLeading: true,
+        backgroundColor: Colors.white,
         elevation: 0,
         title: const Text(
-          "Admin",
+          "Admin Support",
           style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -71,112 +88,66 @@ class _MessageScreenState extends State<MessageScreen> {
   }
 
   Widget buildListView() {
-    return Column(
-      children: [
-        Expanded(
-          child: ListView(
-            shrinkWrap: true,
-            padding: const EdgeInsets.all(16),
-            children: List.generate(
-                _messages.length,
-                (index) => _messages[index]["isMe"]
-                    ? Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(16),
-                                  decoration: BoxDecoration(
-                                      color: const Color(0xffF5F5F5),
-                                      borderRadius: BorderRadius.circular(8)),
-                                  child: Text(
-                                    _messages[index]["message"],
-                                    style: const TextStyle(
-                                        fontFamily: FontConstants.medium,
-                                        fontWeight: FontWeight.w500,
-                                        color: Color(0xff969696)),
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                const Text(
-                                  "02:23 pm",
-                                  style: TextStyle(
-                                      fontFamily: FontConstants.medium,
-                                      fontWeight: FontWeight.w500,
-                                      color: Color(0xff969696)),
-                                ),
-                                const SizedBox(height: 16),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          CircleAvatar(
-                            radius: 27,
-                            backgroundColor: const Color(0xffEAEAEA),
-                            child: CircleAvatar(
-                              radius: 25,
-                              backgroundColor: Colors.grey.shade400,
-                              backgroundImage:
-                                  const NetworkImage(AppConstants.userImage),
-                            ),
-                          ),
-                        ],
-                      )
-                    : Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          CircleAvatar(
-                            radius: 27,
-                            backgroundColor: const Color(0xffEAEAEA),
-                            child: CircleAvatar(
-                              radius: 25,
-                              backgroundColor: Colors.white,
-                              child: Image.asset(
-                                "images/logo_e.png",
-                                width: 35,
-                                height: 35,
+    return GetBuilder<ThreadsController>(
+      builder: (threadsController) {
+        if (threadsController.loading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (threadsController.threadsModel != null) {
+          return GetBuilder<MessageController>(
+            builder: (messageController) {
+              if (messageController.loading) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (messageController.messagesModel != null) {
+                return Column(
+                  children: [
+                    Expanded(
+                      child: ListView.builder(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 20, horizontal: 5),
+                        reverse: true,
+                        itemCount:
+                            messageController.messagesModel?.messages?.length ??
+                                0,
+                        itemBuilder: (BuildContext context, int index) {
+                          return Column(
+                            crossAxisAlignment: messageController.messagesModel
+                                        ?.messages?[index].sender !=
+                                    loginController.loginModel?.user?.id
+                                ? CrossAxisAlignment.start
+                                : CrossAxisAlignment.end,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(10),
+                                margin: const EdgeInsets.symmetric(vertical: 5),
+                                width: MediaQuery.of(context).size.width * 0.8,
+                                decoration: BoxDecoration(
+                                    color: messageController.messagesModel
+                                                ?.messages?[index].sender !=
+                                            loginController.loginModel?.user?.id
+                                        ? Colors.yellow.shade100
+                                        : Colors.green.shade100,
+                                    borderRadius: BorderRadius.circular(20)),
+                                child: Text(messageController.messagesModel
+                                        ?.messages?[index].message ??
+                                    ""),
                               ),
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(16),
-                                  decoration: BoxDecoration(
-                                      color: const Color(0xffF5F5F5),
-                                      borderRadius: BorderRadius.circular(8)),
-                                  child: Text(
-                                    _messages[index]["message"],
-                                    style: const TextStyle(
-                                        fontFamily: FontConstants.medium,
-                                        fontWeight: FontWeight.w500,
-                                        color: Color(0xff969696)),
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                const Text(
-                                  "02:23 pm",
-                                  style: TextStyle(
-                                      fontFamily: FontConstants.medium,
-                                      fontWeight: FontWeight.w500,
-                                      color: Color(0xff969696)),
-                                ),
-                                const SizedBox(height: 16),
-                              ],
-                            ),
-                          )
-                        ],
-                      )),
-          ),
-        ),
-        _buildBottom(),
-      ],
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                    _buildBottom(),
+                  ],
+                );
+              }
+              return Container();
+            },
+          );
+        }
+        return Container();
+      },
     );
   }
 
@@ -204,7 +175,7 @@ class _MessageScreenState extends State<MessageScreen> {
               child: textField(
             textInputAction: TextInputAction.done,
             hintText: AppConstants.typeMessage,
-            controller: messageController,
+            controller: sendMessageController,
             focusNode: messageNode,
             isCode: true,
             isSearch: true,
@@ -218,7 +189,23 @@ class _MessageScreenState extends State<MessageScreen> {
                 )),
                 padding:
                     const EdgeInsets.symmetric(horizontal: 30, vertical: 14.5)),
-            onPressed: () {},
+            onPressed: () {
+              socket.emit("send-message", {
+                "reciever": "653571cdfa11c88f0f287abe",
+                "sender": loginController.loginModel?.user?.id,
+                "fcm_token": "",
+                "message": sendMessageController.text,
+                "thread": {}
+              });
+              messageController.addNewMessage({
+                "reciever": "653571cdfa11c88f0f287abe",
+                "sender": loginController.loginModel?.user?.id,
+                "fcm_token": "",
+                "message": sendMessageController.text,
+                "thread": {}
+              });
+              sendMessageController.clear();
+            },
             child: const Text(
               AppConstants.send,
               style: TextStyle(
@@ -231,5 +218,11 @@ class _MessageScreenState extends State<MessageScreen> {
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    socket.close();
+    super.dispose();
   }
 }

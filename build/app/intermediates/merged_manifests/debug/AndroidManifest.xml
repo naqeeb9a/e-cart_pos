@@ -26,7 +26,8 @@
         android:icon="@mipmap/ic_launcher"
         android:label="pos"
         android:largeHeap="true"
-        android:theme="@style/Theme.AppCompat.NoActionBar" >
+        android:theme="@style/Theme.AppCompat.NoActionBar"
+        android:usesCleartextTraffic="true" >
         <activity
             android:name="com.ecart_express.pos.MainActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"

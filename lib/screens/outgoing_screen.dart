@@ -1,5 +1,9 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:pos/controller/add_outgoing_stock.dart';
+import 'package:pos/controller/stores_controller.dart';
+import 'package:pos/model/store_model.dart';
 import 'package:pos/screens/Tabbar/tab_bar_screen.dart';
 import 'package:pos/utils/constants/app_constants.dart';
 import 'package:pos/utils/constants/font_constants.dart';
@@ -18,13 +22,13 @@ class _OutgoingScreenState extends State<OutgoingScreen> {
   TextEditingController quantity = TextEditingController();
   FocusNode titleNode = FocusNode();
   FocusNode quantityNode = FocusNode();
-  final List<String> _stores = [
-    "Jannat Cash and Carry Karachi",
-    "Smart Faisalabad",
-    "Proglabs Johar Town",
-    "Danim Kareem Block",
-    "Bilal Store Ravi Block Market"
-  ];
+  final List<StoreDatum> _stores = Get.find<StoreController>()
+          .storeModel
+          ?.stores
+          ?.data
+          ?.map((e) => e)
+          .toList() ??
+      [];
   String? selectedStore;
   @override
   Widget build(BuildContext context) {
@@ -127,9 +131,9 @@ class _OutgoingScreenState extends State<OutgoingScreen> {
                     ),
                     items: _stores
                         .map((item) => DropdownMenuItem<String>(
-                              value: item,
+                              value: item.id,
                               child: Text(
-                                item,
+                                item.name ?? "not provided",
                                 style: const TextStyle(
                                   fontWeight: FontWeight.w500,
                                   fontFamily: FontConstants.medium,
@@ -178,15 +182,35 @@ class _OutgoingScreenState extends State<OutgoingScreen> {
                     scrollbarAlwaysShow: true,
                   ),
                   const SizedBox(height: 16),
-                  ElevatedButton(
-                      onPressed: () {},
-                      child: const Text(
-                        "Add to Outgoing Stock",
-                        style: TextStyle(
-                            fontFamily: FontConstants.medium,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white),
-                      ))
+                  GetBuilder<AddOutgoingStockController>(
+                      builder: (addOutgoingStockController) {
+                    if (addOutgoingStockController.loading) {
+                      return const SizedBox(
+                        height: 50,
+                        child: Center(child: CircularProgressIndicator()),
+                      );
+                    }
+                    return ElevatedButton(
+                        onPressed: () {
+                          Get.find<AddOutgoingStockController>()
+                              .addOutgoingStock({
+                            "products": [
+                              {
+                                "code_or_title": title.text,
+                                "quantity": quantity.text
+                              }
+                            ],
+                            "store": selectedStore
+                          });
+                        },
+                        child: const Text(
+                          "Add to Outgoing Stock",
+                          style: TextStyle(
+                              fontFamily: FontConstants.medium,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.white),
+                        ));
+                  })
                 ],
               ),
             ),

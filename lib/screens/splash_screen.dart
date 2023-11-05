@@ -1,45 +1,43 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:pos/screens/Auth/signin_screen.dart';
-import 'package:pos/utils/helping_method.dart';
 
-class SplashScreen extends StatefulWidget {
+import '../controller/login_controller.dart';
+import '../controller/profile controller/profile_controller.dart';
+import '../model/login_model.dart';
+import '../utils/global.dart';
+import 'Tabbar/tab_bar_screen.dart';
+
+class SplashScreen extends StatelessWidget {
   const SplashScreen({Key? key}) : super(key: key);
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
-}
-
-class _SplashScreenState extends State<SplashScreen>
-    with SingleTickerProviderStateMixin {
-  bool visible = false;
-
-  @override
-  void initState() {
+  Widget build(BuildContext context) {
     Future.delayed(const Duration(seconds: 1)).then((value) {
-      setState(() {
-        visible = !visible;
-      });
-      Future.delayed(const Duration(seconds: 2)).then((value) {
-        HelpingMethods().openAndReplaceScreen(
-            context: context, screen: const SignInScreen());
+      String? user = Global.storageService.getAuthenticationModelString();
+      if (user == null) {
+        return Get.off(() => const SignInScreen());
+      }
+      LoginController loginController = Get.find();
+      loginController.setLoginModel(loginModelFromJson(user));
+      Get.find<LoadProfileController>()
+          .getProfile(
+              context, loginController.loginModel?.tokens?.accessToken ?? "")
+          .then((value) {
+        if (value == true) {
+          return Get.off(() => const DrawerScreen());
+        } else {
+          return Get.off(() => const SignInScreen());
+        }
       });
     });
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffF9B820),
       body: Center(
-          child: AnimatedOpacity(
-            opacity: visible ? 1.0 : 0.0,
-            duration: const Duration(milliseconds: 500),
-            child: Image.asset(
-              "images/logo.png",
-              scale: 3,
-            ),
-          )),
+          child: Image.asset(
+        "images/logo.png",
+        scale: 3,
+      )),
     );
   }
 }

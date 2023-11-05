@@ -58,7 +58,8 @@ class CheckOutScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   _checkoutDetailHeading("Sub Total"),
-                  _checkoutDetailSubHeading("\$482"),
+                  _checkoutDetailSubHeading(
+                      "\$${(invoicesByProductsModel?.bill?.items?.first.price ?? 0) * (invoicesByProductsModel?.bill?.items?.first.quantity ?? 0)}"),
                 ],
               ),
               const SizedBox(height: 8),
@@ -66,7 +67,10 @@ class CheckOutScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   _checkoutDetailHeading("Tax (17%)"),
-                  _checkoutDetailSubHeading(isEClan ? "\$12" : "Free",
+                  _checkoutDetailSubHeading(
+                      isEClan
+                          ? "\$${(invoicesByProductsModel?.bill?.items?.first.price ?? 0) * (17 / 100)}"
+                          : "Free",
                       color: const Color(0xffF9B820))
                 ],
               ),
@@ -75,7 +79,8 @@ class CheckOutScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   _checkoutDetailHeading("Discount Price"),
-                  _checkoutDetailSubHeading("\$12"),
+                  _checkoutDetailSubHeading(
+                      "\$${invoicesByProductsModel?.bill?.items?.first.priceDiscount ?? 0}"),
                 ],
               ),
               const Spacer(),
@@ -124,9 +129,9 @@ class CheckOutScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                subtitle: const Text(
-                  "\$482",
-                  style: TextStyle(
+                subtitle: Text(
+                  "\$${(((invoicesByProductsModel?.bill?.items?.first.price ?? 0) * (invoicesByProductsModel?.bill?.items?.first.quantity ?? 0)) - (invoicesByProductsModel?.bill?.items?.first.priceDiscount ?? 0)) + ((invoicesByProductsModel?.bill?.items?.first.price ?? 0) * (17 / 100))}",
+                  style: const TextStyle(
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
                     fontFamily: "Inter-Bold",
